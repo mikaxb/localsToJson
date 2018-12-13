@@ -6,9 +6,8 @@ using EnvDTE;
 namespace ObjectDumper
 {
     internal class JsonGenerator
-    {
-        private Expression RootExpression { get; set; }
-        private Stopwatch RunTimeTimer { get; } = new Stopwatch();
+    {       
+        private Stopwatch RuntimeTimer { get; } = new Stopwatch();
         public int TimeOutInSeconds { get; set; } = 10;
         public JsonGenerator()
         {
@@ -18,10 +17,10 @@ namespace ObjectDumper
 
         public string GenerateJson(Expression expression)
         {
-            RunTimeTimer.Start();
+            RuntimeTimer.Start();
             var result = GenerateJsonRecurse(expression);
-            RunTimeTimer.Stop();
-            RunTimeTimer.Reset();
+            RuntimeTimer.Stop();
+            RuntimeTimer.Reset();
             result = result.TrimEnd(',');
             result = "{" + result + "}";
             return result;
@@ -29,7 +28,7 @@ namespace ObjectDumper
 
         private string GenerateJsonRecurse(Expression currentExpression)
         {
-            if (RunTimeTimer.ElapsedMilliseconds > (TimeOutInSeconds*1000))
+            if (RuntimeTimer.ElapsedMilliseconds > (TimeOutInSeconds*1000))
             {
                 throw new TimeoutException("Timeout while generating JSON.");
             }
