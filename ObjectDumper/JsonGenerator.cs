@@ -6,14 +6,15 @@ using EnvDTE;
 namespace ObjectDumper
 {
     internal class JsonGenerator
-    {       
-        private Stopwatch RuntimeTimer { get; } = new Stopwatch();
-        public int TimeOutInSeconds { get; set; } = 10;
+    {
         public JsonGenerator()
         {
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
         }
+
+        public int TimeOutInSeconds { get; set; } = 10;
         private Regex PartOfCollection { get; } = new Regex(@"\[\d+\]");
+        private Stopwatch RuntimeTimer { get; } = new Stopwatch();
 
         public string GenerateJson(Expression expression)
         {
@@ -26,9 +27,51 @@ namespace ObjectDumper
             return result;
         }
 
+        private bool ExpressionIsDictionary(Expression exp)
+        {
+            if (exp.Type.StartsWith("System.Collections.Generic.Dictionary"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool ExpressionIsListOrArray(Expression exp)
+        {
+            if (exp.Type.StartsWith("System.Collections.Generic.List"))
+            {
+                return true;
+            }
+            if (exp.Type.EndsWith("[]"))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool ExpressionIsValue(Expression exp)
+        {
+            switch (exp.Type.Trim('?'))
+            {
+                case "string":
+                case "System.DateTime":
+                case "int":
+                case "char":
+                case "bool":
+                case "double":
+                case "float":
+                case "decimal":
+                case "long":
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
         private string GenerateJsonRecurse(Expression currentExpression)
         {
-            if (RuntimeTimer.ElapsedMilliseconds > (TimeOutInSeconds*1000))
+            if (RuntimeTimer.ElapsedMilliseconds > (TimeOutInSeconds * 1000))
             {
                 throw new TimeoutException("Timeout while generating JSON.");
             }
@@ -53,7 +96,6 @@ namespace ObjectDumper
                                 {
                                     key = $"{{{GenerateJsonRecurse(dicCollectionExpression)}}}";
                                 }
-
                             }
                             if (dicCollectionExpression.Name == "value")
                             {
@@ -66,7 +108,6 @@ namespace ObjectDumper
                                     value = $"{{{GenerateJsonRecurse(dicCollectionExpression)}}}";
                                 }
                             }
-
                         }
                         ret += $"{key}:{value},";
                     }
@@ -74,7 +115,6 @@ namespace ObjectDumper
                 ret = ret.TrimEnd(',');
                 return ret;
             }
-
 
             if (ExpressionIsValue(currentExpression))
             {
@@ -117,7 +157,6 @@ namespace ObjectDumper
                     {
                         ret += $"\"{subExpression.Name}\":{GenerateJsonRecurse(subExpression)}";
                     }
-
                     else
                     {
                         ret += $"\"{subExpression.Name}\":{{{GenerateJsonRecurse(subExpression)}}}";
@@ -127,16 +166,15 @@ namespace ObjectDumper
                 ret = ret.TrimEnd(',');
                 return ret;
             }
-
         }
 
         private string GetJsonRepresentationofValue(Expression exp)
         {
-            
             switch (exp.Type.Trim('?'))
             {
                 case "System.DateTime":
                     return $"\"{exp.Value.Replace("{", "").Replace("}", "")}\"";
+
                 case "int":
                 case "string":
                 case "bool":
@@ -145,53 +183,13 @@ namespace ObjectDumper
                 case "decimal":
                 case "long":
                     return exp.Value;
+
                 case "char":
                     return $"\"{exp.Value.Substring(exp.Value.IndexOf("'") + 1, 1)}\"";
+
                 default:
                     return string.Empty;
             }
         }
-
-        private bool ExpressionIsListOrArray(Expression exp)
-        {
-            if (exp.Type.StartsWith("System.Collections.Generic.List"))
-            {
-                return true;
-            }
-            if (exp.Type.EndsWith("[]"))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private bool ExpressionIsDictionary(Expression exp)
-        {
-            if (exp.Type.StartsWith("System.Collections.Generic.Dictionary"))
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private bool ExpressionIsValue(Expression exp)
-        {
-            switch (exp.Type.Trim('?'))
-            {
-                case "string":
-                case "System.DateTime":
-                case "int":
-                case "char":
-                case "bool":
-                case "double":
-                case "float":
-                case "decimal":
-                case "long":
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
     }
 }

@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Globalization;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
-using Microsoft.VisualStudio.PlatformUI;
 
 namespace ObjectDumper
 {
@@ -102,7 +99,7 @@ namespace ObjectDumper
             foreach (Expression item in locals)
             {
                 localList.Add(item);
-            }          
+            }
             var dialog = new ExportDialog(localList);
             dialog.ShowDialog();
         }

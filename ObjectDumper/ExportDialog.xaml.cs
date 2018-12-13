@@ -11,31 +11,20 @@ namespace ObjectDumper
     /// </summary>
     public partial class ExportDialog : System.Windows.Window
     {
-        private List<EnvDTE.Expression> Locals { get; set; }
         public ExportDialog(List<EnvDTE.Expression> locals)
         {
             InitializeComponent();
             Locals = locals;
             PopulateDropDown(locals);
         }
-        private void PopulateDropDown(List<EnvDTE.Expression> locals)
-        {
-            try
-            {
-                Dispatcher.VerifyAccess();
-                locals.ForEach(i => LocalDropDown.Items.Add(i.Name));
-            }
-            catch (Exception ex)
-            {
-                TypeInfo.Text = $"Exception of type {ex.GetType()} occured";
-                OutPut.Text = ex.ToString();
-            }
-        }
+
+        private List<EnvDTE.Expression> Locals { get; set; }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
+
         private void LocalDropDown_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             try
@@ -53,8 +42,20 @@ namespace ObjectDumper
                 TypeInfo.Text = $"Exception of type {ex.GetType()} occured";
                 OutPut.Text = ex.ToString();
             }
-
         }
 
+        private void PopulateDropDown(List<EnvDTE.Expression> locals)
+        {
+            try
+            {
+                Dispatcher.VerifyAccess();
+                locals.ForEach(i => LocalDropDown.Items.Add(i.Name));
+            }
+            catch (Exception ex)
+            {
+                TypeInfo.Text = $"Exception of type {ex.GetType()} occured";
+                OutPut.Text = ex.ToString();
+            }
+        }
     }
 }
