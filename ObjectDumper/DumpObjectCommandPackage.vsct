@@ -40,6 +40,9 @@
         <!--<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>--><!-- For right click menu -->
         <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
       </Group>
+      <Group guid="guidDumpObjectCommandPackageCmdSet" id="MyMenuGroupContext" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>        
+      </Group>
     </Groups>
 
     <!--Buttons section. -->
@@ -60,11 +63,11 @@
           <ButtonText>Dump variable from locals as JSON</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidDumpObjectCommandPackageCmdSet" id="cmdidToolWindow1Command" priority="0x0100" type="Button">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS1" />
-        <Icon guid="guidImages1" id="bmpPic1" />
+      <Button guid="guidDumpObjectCommandPackageCmdSet" id="DumpObjectCommandIdc" priority="0x0100" type="Button">
+        <Parent guid="guidDumpObjectCommandPackageCmdSet" id="MyMenuGroupContext" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>ToolWindow1</ButtonText>
+          <ButtonText>Dump as JSON to clipboard</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -82,6 +85,7 @@
   </Commands>
   <VisibilityConstraints>
     <VisibilityItem guid="guidDumpObjectCommandPackageCmdSet" id="DumpObjectCommandId" context="UICONTEXT_Debugging" />
+    <VisibilityItem guid="guidDumpObjectCommandPackageCmdSet" id="DumpObjectCommandIdc" context="UICONTEXT_Debugging" />
   </VisibilityConstraints>
   <Symbols>
     <!-- This is the package guid. -->
@@ -90,7 +94,9 @@
     <!-- This is the guid used to group the menu commands together -->
     <GuidSymbol name="guidDumpObjectCommandPackageCmdSet" value="{e352a0e9-68b9-427d-87f5-7db47da08b18}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
+      <IDSymbol name="MyMenuGroupContext" value="0x1030" />
       <IDSymbol name="DumpObjectCommandId" value="0x0100" />
+      <IDSymbol name="DumpObjectCommandIdc" value="0x0101" />
       <IDSymbol value="4129" name="cmdidToolWindow1Command" />
     </GuidSymbol>
 

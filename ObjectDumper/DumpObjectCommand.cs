@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Windows;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
+using Expression = EnvDTE.Expression;
 
 namespace ObjectDumper
 {
@@ -16,6 +18,7 @@ namespace ObjectDumper
         /// Command ID.
         /// </summary>
         public const int CommandId = 0x0100;
+        public const int ContextMenuCommandId = 0x0101;
 
         /// <summary>
         /// Command menu group (command set GUID).
@@ -40,8 +43,12 @@ namespace ObjectDumper
 
             var menuCommandID = new CommandID(CommandSet, CommandId);
             var menuItem = new MenuCommand(this.Execute, menuCommandID);
-
             commandService.AddCommand(menuItem);
+
+            var menuCommandIDc = new CommandID(CommandSet, ContextMenuCommandId);
+            var menuItemc = new MenuCommand(this.ContextMenuExecute, menuCommandIDc);
+
+            commandService.AddCommand(menuItemc);
         }
 
         /// <summary>
@@ -102,6 +109,72 @@ namespace ObjectDumper
             }
             var dialog = new ExportDialog(localList);
             dialog.ShowDialog();
+        }
+
+        private void ContextMenuExecute(object sender, EventArgs e)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            DTE dte;
+
+            dte = (DTE)this.ServiceProvider.GetServiceAsync(typeof(DTE)).Result;
+            Document doc = dte.ActiveDocument;
+           
+
+            TextDocument txt = doc.Object() as TextDocument;
+
+            var selection = txt.Selection;//dte.ActiveWindow.Selection as TextSelection;// 
+
+            if (selection.IsEmpty)
+            {
+                //todo
+                return;
+            }
+            var text = selection.Text;
+            var debugger = dte.Debugger;
+            var locals = debugger.CurrentStackFrame.Locals;
+
+            var localList = new List<Expression>();
+            foreach (Expression item in locals)
+            {
+                if (item.Name == text)
+                {
+                    var jsongenerator = new JsonGenerator();
+                    var json = jsongenerator.GenerateJson(item);
+                    Clipboard.SetText(json);
+                    return;
+                }
+            }
+
+            System.Windows.Forms.MessageBox.Show("Could not found a local matching current selection.");
+
+
+            var anchorPoint = selection.AnchorPoint as TextPoint;
+
+            var editpoint = anchorPoint.CreateEditPoint();
+            editpoint.CharRight(1);
+
+
+            
+            var iagret = selection.IsActiveEndGreater;
+
+            CodeElement foundElem = null;
+            vsCMElement correct;
+            foreach (vsCMElement el in Enum.GetValues( typeof(vsCMElement)))
+            {
+                var codeIte = editpoint.CodeElement[el];
+                if(codeIte != null)
+                {
+                    foundElem = codeIte;
+                    correct = el;
+                }
+            }
+
+            var codeItem = anchorPoint.CodeElement[vsCMElement.vsCMElementOther];
+            var fullname = codeItem.FullName;
+                
+
+
+           
         }
     }
 }
