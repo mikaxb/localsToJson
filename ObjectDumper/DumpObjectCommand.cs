@@ -148,7 +148,7 @@ namespace ObjectDumper
                 }
             }
 
-            System.Windows.Forms.MessageBox.Show("Could not found a local matching current selection.");
+            System.Windows.Forms.MessageBox.Show($"Could not found a local matching current selection.{Environment.NewLine}'{text}'");
            
         }
     }
