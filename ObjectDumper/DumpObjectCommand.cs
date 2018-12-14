@@ -118,18 +118,21 @@ namespace ObjectDumper
 
             dte = (DTE)this.ServiceProvider.GetServiceAsync(typeof(DTE)).Result;
             Document doc = dte.ActiveDocument;
-           
 
             TextDocument txt = doc.Object() as TextDocument;
-
-            var selection = txt.Selection;//dte.ActiveWindow.Selection as TextSelection;// 
-
+            
+            var selection = txt.Selection;
+            var text = selection.Text;
             if (selection.IsEmpty)
             {
-                //todo
-                return;
+                var leftPoint = selection.AnchorPoint.CreateEditPoint();
+                leftPoint.WordLeft(1);
+                var rightPoint = selection.ActivePoint.CreateEditPoint();
+                rightPoint.WordRight(1);
+                var madeSelectionText = leftPoint.GetText(rightPoint);
+                text = madeSelectionText;
             }
-            var text = selection.Text;
+            
             var debugger = dte.Debugger;
             var locals = debugger.CurrentStackFrame.Locals;
 
@@ -146,34 +149,6 @@ namespace ObjectDumper
             }
 
             System.Windows.Forms.MessageBox.Show("Could not found a local matching current selection.");
-
-
-            var anchorPoint = selection.AnchorPoint as TextPoint;
-
-            var editpoint = anchorPoint.CreateEditPoint();
-            editpoint.CharRight(1);
-
-
-            
-            var iagret = selection.IsActiveEndGreater;
-
-            CodeElement foundElem = null;
-            vsCMElement correct;
-            foreach (vsCMElement el in Enum.GetValues( typeof(vsCMElement)))
-            {
-                var codeIte = editpoint.CodeElement[el];
-                if(codeIte != null)
-                {
-                    foundElem = codeIte;
-                    correct = el;
-                }
-            }
-
-            var codeItem = anchorPoint.CodeElement[vsCMElement.vsCMElementOther];
-            var fullname = codeItem.FullName;
-                
-
-
            
         }
     }
