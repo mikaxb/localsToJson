@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
-using System.Windows;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
@@ -63,7 +62,7 @@ namespace ObjectDumper
         /// <summary>
         /// Gets the service provider from the owner package.
         /// </summary>
-        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
+        private IAsyncServiceProvider ServiceProvider
         {
             get
             {
@@ -95,10 +94,7 @@ namespace ObjectDumper
         private void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            DTE dte;
-
-            dte = (DTE)this.ServiceProvider.GetServiceAsync(typeof(DTE)).Result;
-
+            DTE dte = GetDTE();
             var debugger = dte.Debugger;
             var locals = debugger.CurrentStackFrame.Locals;
 
@@ -114,9 +110,7 @@ namespace ObjectDumper
         private void ContextMenuExecute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            DTE dte;
-
-            dte = (DTE)this.ServiceProvider.GetServiceAsync(typeof(DTE)).Result;
+            DTE dte = GetDTE();
             Document doc = dte.ActiveDocument;
 
             TextDocument txt = doc.Object() as TextDocument;
@@ -143,13 +137,23 @@ namespace ObjectDumper
                 {
                     var jsongenerator = new JsonGenerator();
                     var json = jsongenerator.GenerateJson(item);
-                    Clipboard.SetText(json);
+                    System.Windows.Clipboard.SetText(json);
                     return;
                 }
             }
 
-            System.Windows.Forms.MessageBox.Show($"Could not found a local matching current selection.{Environment.NewLine}'{text}'");
-           
+            System.Windows.Forms.MessageBox.Show($"Could not found a local matching current selection.{Environment.NewLine}'{text}'");           
+        }
+
+        private DTE GetDTE()
+        {
+            DTE dte =  ThreadHelper.JoinableTaskFactory.Run(async delegate
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                return await ServiceProvider.GetServiceAsync(typeof(DTE)) as DTE;
+
+            });
+            return dte;
         }
     }
 }
