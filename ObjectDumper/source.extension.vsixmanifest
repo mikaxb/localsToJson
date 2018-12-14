@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="LocalsToJson.8a65b801-a83d-49cb-adbb-737694b75ded" Version="0.21" Language="en-US" Publisher="Mikael Axblom" />
+        <Identity Id="ObjectDumper.8a65b801-a83d-49cb-adbb-737694b75ded" Version="0.21" Language="en-US" Publisher="Mikael Axblom" />
         <DisplayName>Local variable JSON dumper</DisplayName>
         <Description xml:space="preserve">Lets you pick from locals when debugging and dump the variable to JSON.</Description>
     </Metadata>
