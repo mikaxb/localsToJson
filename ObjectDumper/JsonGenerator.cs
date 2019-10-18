@@ -18,13 +18,21 @@ namespace ObjectDumper
 
         public string GenerateJson(Expression expression)
         {
-            RuntimeTimer.Start();
-            var result = GenerateJsonRecurse(expression);
-            RuntimeTimer.Stop();
-            RuntimeTimer.Reset();
-            result = result.TrimEnd(',');
-            result = "{" + result + "}";
-            return result;
+            try
+            {
+                RuntimeTimer.Start();
+                var result = GenerateJsonRecurse(expression);
+                RuntimeTimer.Stop();
+                RuntimeTimer.Reset();
+                result = result.TrimEnd(',');
+                result = "{" + result + "}";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show($"Could not generate JSON due to {ex.GetType().Name}: {ex.Message}.{Environment.NewLine}Sorry, this extension cannot handle everything.{Environment.NewLine}Try a smaller, less complex object.");
+            }
+            return string.Empty;
         }
 
         private bool ExpressionIsDictionary(Expression exp)
