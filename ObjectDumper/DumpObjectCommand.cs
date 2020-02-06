@@ -96,6 +96,11 @@ namespace ObjectDumper
             ThreadHelper.ThrowIfNotOnUIThread();
             DTE dte = GetDTE();
             var debugger = dte.Debugger;
+            if (debugger.CurrentStackFrame is null)
+            {
+                System.Windows.Forms.MessageBox.Show($"CurrentStackFrame is not available.");
+                return;
+            }
             var locals = debugger.CurrentStackFrame.Locals;
 
             var localList = new List<Expression>();
