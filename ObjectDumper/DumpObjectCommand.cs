@@ -124,13 +124,17 @@ namespace ObjectDumper
                 var rightPoint = selection.ActivePoint.CreateEditPoint();
                 rightPoint.WordRight(1);
                 var madeSelectionText = leftPoint.GetText(rightPoint);
-                text = madeSelectionText;
+                text = madeSelectionText.Trim();
             }
             
             var debugger = dte.Debugger;
+            if(debugger.CurrentStackFrame is null)
+            {
+                System.Windows.Forms.MessageBox.Show($"CurrentStackFrame is not available.");
+                return;
+            }
             var locals = debugger.CurrentStackFrame.Locals;
 
-            var localList = new List<Expression>();
             foreach (Expression item in locals)
             {
                 if (item.Name == text)

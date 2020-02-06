@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 using EnvDTE;
 
 namespace ObjectDumper
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "Done in constructor.")]
     internal class JsonGenerator
     {
         public JsonGenerator()
@@ -12,7 +14,7 @@ namespace ObjectDumper
             Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
         }
 
-        public int TimeOutInSeconds { get; set; } = 10;
+        public int TimeOutInSeconds { get; } = 10;
         private Regex PartOfCollection { get; } = new Regex(@"\[\d+\]");
         private Stopwatch RuntimeTimer { get; } = new Stopwatch();
 
@@ -24,8 +26,6 @@ namespace ObjectDumper
                 var result = GenerateJsonRecurse(expression);
                 RuntimeTimer.Stop();
                 RuntimeTimer.Reset();
-                result = result.TrimEnd(',');
-                result = "{" + result + "}";
                 return result;
             }
             catch (Exception ex)
@@ -77,15 +77,16 @@ namespace ObjectDumper
             }
         }
 
+      
         private string GenerateJsonRecurse(Expression currentExpression)
-        {
+        {          
             if (RuntimeTimer.ElapsedMilliseconds > (TimeOutInSeconds * 1000))
             {
                 throw new TimeoutException("Timeout while generating JSON.");
             }
             if (ExpressionIsDictionary(currentExpression))
             {
-                var ret = string.Empty;
+                var values = new StringBuilder();
                 foreach (Expression dicSubExpression in currentExpression.DataMembers)
                 {
                     if (PartOfCollection.IsMatch(dicSubExpression.Name))
@@ -96,32 +97,17 @@ namespace ObjectDumper
                         {
                             if (dicCollectionExpression.Name == "key")
                             {
-                                if (ExpressionIsValue(dicCollectionExpression) || ExpressionIsListOrArray(dicCollectionExpression))
-                                {
-                                    key = GenerateJsonRecurse(dicCollectionExpression);
-                                }
-                                else
-                                {
-                                    key = $"{{{GenerateJsonRecurse(dicCollectionExpression)}}}";
-                                }
+                                key = GenerateJsonRecurse(dicCollectionExpression);
                             }
                             if (dicCollectionExpression.Name == "value")
                             {
-                                if (ExpressionIsValue(dicCollectionExpression) || ExpressionIsListOrArray(dicCollectionExpression))
-                                {
-                                    value = GenerateJsonRecurse(dicCollectionExpression);
-                                }
-                                else
-                                {
-                                    value = $"{{{GenerateJsonRecurse(dicCollectionExpression)}}}";
-                                }
+                                value = GenerateJsonRecurse(dicCollectionExpression);
                             }
                         }
-                        ret += $"{key}:{value},";
+                        values.Append($"{key}:{value},");
                     }
                 }
-                ret = ret.TrimEnd(',');
-                return ret;
+                return $"{{{values.ToString().TrimEnd(',')}}}";
             }
 
             if (ExpressionIsValue(currentExpression))
@@ -130,49 +116,36 @@ namespace ObjectDumper
             }
             else if (ExpressionIsListOrArray(currentExpression))
             {
-                var ret = string.Empty;
-                ret += "[";
-
+                var values = new StringBuilder();
                 foreach (Expression ex in currentExpression.DataMembers)
                 {
                     if (PartOfCollection.IsMatch(ex.Name))
                     {
-                        if (ExpressionIsValue(ex) || ExpressionIsListOrArray(ex))
-                        {
-                            ret += GenerateJsonRecurse(ex);
-                        }
-                        else
-                        {
-                            ret += $"{{{GenerateJsonRecurse(ex)}}}";
-                        }
-                        ret += ",";
+                        values.Append(GenerateJsonRecurse(ex) + ",");
                     }
                 }
-                ret = ret.TrimEnd(',');
-                ret += $"]";
-                return ret;
+                return $"[{values.ToString().TrimEnd(',')}]";
             }
             else
             {
-                var ret = string.Empty;
+                var values = new StringBuilder();
                 foreach (Expression subExpression in currentExpression.DataMembers)
                 {
                     if (subExpression.Value == "null")
                     {
-                        ret += $"\"{subExpression.Name}\":null";
+                        values.Append($"\"{subExpression.Name}\":null");
                     }
                     else if (ExpressionIsValue(subExpression) || ExpressionIsListOrArray(subExpression))
                     {
-                        ret += $"\"{subExpression.Name}\":{GenerateJsonRecurse(subExpression)}";
+                        values.Append($"\"{subExpression.Name}\":{GenerateJsonRecurse(subExpression)}");
                     }
                     else
                     {
-                        ret += $"\"{subExpression.Name}\":{{{GenerateJsonRecurse(subExpression)}}}";
+                        values.Append($"\"{subExpression.Name}\":{GenerateJsonRecurse(subExpression)}");
                     }
-                    ret += ",";
+                    values.Append(",");
                 }
-                ret = ret.TrimEnd(',');
-                return ret;
+                return $"{{{values.ToString().TrimEnd(',')}}}";
             }
         }
 
