@@ -9,10 +9,12 @@ namespace ObjectDumper
     /// <summary>
     /// Interaction logic for WpfDialog.xaml
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD010:Invoke single-threaded types on Main thread", Justification = "Done in constructor.")]
     public partial class ExportDialog : System.Windows.Window
     {
         public ExportDialog(List<EnvDTE.Expression> locals)
         {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             InitializeComponent();
             Locals = locals;
             PopulateDropDown(locals);

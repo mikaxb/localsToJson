@@ -5,6 +5,7 @@ using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using Expression = EnvDTE.Expression;
+using EnvDTE80;
 
 namespace ObjectDumper
 {
@@ -18,6 +19,7 @@ namespace ObjectDumper
         /// </summary>
         public const int CommandId = 0x0100;
         public const int ContextMenuCommandId = 0x0101;
+        public const int LocalsContextMenuCommandId = 0x0102;
 
         /// <summary>
         /// Command menu group (command set GUID).
@@ -48,6 +50,11 @@ namespace ObjectDumper
             var menuItemc = new MenuCommand(this.ContextMenuExecute, menuCommandIDc);
 
             commandService.AddCommand(menuItemc);
+
+            var menuCommandIDLocalsContext = new CommandID(CommandSet, LocalsContextMenuCommandId);
+            var menuItemLocalsContext = new MenuCommand(this.LocalsContextMenuExecute, menuCommandIDLocalsContext);
+
+            commandService.AddCommand(menuItemLocalsContext);
         }
 
         /// <summary>
@@ -154,12 +161,55 @@ namespace ObjectDumper
             System.Windows.Forms.MessageBox.Show($"Could not found a local matching current selection.{Environment.NewLine}'{text}'");           
         }
 
-        private DTE GetDTE()
+        private void LocalsContextMenuExecute(object sender, EventArgs e)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            var dte = Package.GetGlobalService(typeof(DTE)) as DTE2;
+            var serverExplorer = dte.ToolWindows.GetToolWindow("Locals");
+
+            
+
+
+            var debugger = dte.Debugger;
+            if (debugger.CurrentStackFrame is null)
+            {
+                System.Windows.Forms.MessageBox.Show($"CurrentStackFrame is not available.");
+                return;
+            }
+          
+
+            var items = new List<object>();
+            foreach(var item in dte.Windows)
+            {
+                items.Add(item);
+            }
+
+            var loc = dte.Windows.Item(EnvDTE.Constants.vsWindowKindLocals);
+         
+
+
+            var t = 7;
+
+        }
+
+
+            private DTE GetDTE()
         {
             DTE dte =  ThreadHelper.JoinableTaskFactory.Run(async delegate
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 return await ServiceProvider.GetServiceAsync(typeof(DTE)) as DTE;
+
+            });
+            return dte;
+        }
+
+        private DTE2 GetDTE80()
+        {
+            DTE2 dte = ThreadHelper.JoinableTaskFactory.Run(async delegate
+            {
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                return await ServiceProvider.GetServiceAsync(typeof(DTE2)) as DTE2;
 
             });
             return dte;
