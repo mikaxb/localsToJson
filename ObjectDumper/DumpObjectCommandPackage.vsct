@@ -46,9 +46,9 @@
       <Group guid="guidDumpObjectCommandPackageCmdSet" id="MyMenuGroupContext" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>        
       </Group>
-      <Group guid="guidDumpObjectCommandPackageCmdSet" id="MyMenuGroupContextWatch" priority="0x0600">
+      <!--<Group guid="guidDumpObjectCommandPackageCmdSet" id="MyMenuGroupContextWatch" priority="0x0600">
         <Parent guid="guidVSDebugGroup" id="IDM_LOCALS_CONTEXT"/>
-      </Group>
+      </Group>-->
     </Groups>
 
     <!--Buttons section. -->
@@ -75,14 +75,7 @@
         <Strings>
           <ButtonText>Dump as JSON to clipboard</ButtonText>
         </Strings>
-      </Button>
-      <Button guid="guidDumpObjectCommandPackageCmdSet" id="DumpObjectCommandIdcWatch" priority="0x0100" type="Button">
-        <Parent guid="guidDumpObjectCommandPackageCmdSet" id="MyMenuGroupContextWatch" />
-        <CommandFlag>DynamicVisibility</CommandFlag>
-        <Strings>
-          <ButtonText>Dump as JSON to clipboard</ButtonText>
-        </Strings>
-      </Button>
+      </Button>      
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -99,7 +92,6 @@
   <VisibilityConstraints>
     <VisibilityItem guid="guidDumpObjectCommandPackageCmdSet" id="DumpObjectCommandId" context="UICONTEXT_Debugging" />
     <VisibilityItem guid="guidDumpObjectCommandPackageCmdSet" id="DumpObjectCommandIdc" context="UICONTEXT_Debugging" />
-    <VisibilityItem guid="guidDumpObjectCommandPackageCmdSet" id="DumpObjectCommandIdcWatch" context="UICONTEXT_Debugging" />
   </VisibilityConstraints>
   <Symbols>
     <!-- This is the package guid. -->
@@ -109,10 +101,8 @@
     <GuidSymbol name="guidDumpObjectCommandPackageCmdSet" value="{e352a0e9-68b9-427d-87f5-7db47da08b18}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="MyMenuGroupContext" value="0x1030" />
-      <IDSymbol name="MyMenuGroupContextWatch" value="0x1040" />
       <IDSymbol name="DumpObjectCommandId" value="0x0100" />
       <IDSymbol name="DumpObjectCommandIdc" value="0x0101" />
-      <IDSymbol name="DumpObjectCommandIdcWatch" value="0x0102" />
       <IDSymbol value="4129" name="cmdidToolWindow1Command" />
     </GuidSymbol>
 
