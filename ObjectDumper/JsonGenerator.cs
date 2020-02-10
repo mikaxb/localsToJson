@@ -104,7 +104,7 @@ namespace ObjectDumper
                                 value = GenerateJsonRecurse(dicCollectionExpression);
                             }
                         }
-                        values.Append($"{key}:{value},");
+                        values.Append($"\"{key.Trim('"')}\":{value},");
                     }
                 }
                 return $"{{{values.ToString().TrimEnd(',')}}}";
