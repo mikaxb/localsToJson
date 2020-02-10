@@ -5,6 +5,7 @@ using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using Expression = EnvDTE.Expression;
+using EnvDTE80;
 
 namespace ObjectDumper
 {
@@ -18,6 +19,7 @@ namespace ObjectDumper
         /// </summary>
         public const int CommandId = 0x0100;
         public const int ContextMenuCommandId = 0x0101;
+        public const int LocalsContextMenuCommandId = 0x0102;
 
         /// <summary>
         /// Command menu group (command set GUID).
@@ -156,7 +158,7 @@ namespace ObjectDumper
 
         private DTE GetDTE()
         {
-            DTE dte =  ThreadHelper.JoinableTaskFactory.Run(async delegate
+            DTE dte = ThreadHelper.JoinableTaskFactory.Run(async delegate
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
                 return await ServiceProvider.GetServiceAsync(typeof(DTE)) as DTE;
@@ -164,5 +166,6 @@ namespace ObjectDumper
             });
             return dte;
         }
+
     }
 }

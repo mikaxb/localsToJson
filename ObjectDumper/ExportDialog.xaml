@@ -5,14 +5,19 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ObjectDumper"
              mc:Ignorable="d"
-             d:DesignHeight="200" Width="400"
-            SizeToContent="WidthAndHeight"
+             d:DesignHeight="350" Width="480"
+            Height="380"
+             ResizeMode="NoResize"
             Title="Dump variable from locals as JSON">
 
-    <Grid Width="450" Height="300">
-        <ComboBox HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" VerticalAlignment="Top" Width="186" Name="LocalDropDown" SelectionChanged="LocalDropDown_SelectionChanged" />
-        <Button Content="Close" HorizontalAlignment="Right" Margin="0,0,10.333,9.667" VerticalAlignment="Bottom" Width="75" Click="Button_Click" />
-        <TextBox HorizontalAlignment="Left" Height="auto" Margin="10,38,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="auto" Name="OutPut" MinWidth="400" MinLines="20" MaxHeight="200" />
-        <TextBlock HorizontalAlignment="Left" Margin="209,14,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"  Name="TypeInfo" />
+    <Grid Width="auto" Height="auto" Margin="10,10,0,0" >
+        <ComboBox  HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" VerticalAlignment="Top" Width="250" Name="LocalDropDown" SelectionChanged="LocalDropDown_SelectionChanged" />
+        <Button Content="Copy to clipboard" Name="CopyButton" Height="23" HorizontalAlignment="Left" Margin="270,10,0,0" VerticalAlignment="top" Width="114" Click="CopyToClipBoardButtonClick"/>
+        <TextBlock HorizontalAlignment="Left" Margin="12,36,0,0" TextWrapping="NoWrap" Text="" VerticalAlignment="Top"  Name="TypeInfo" />
+        <TextBox  ScrollViewer.VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Height="auto" Margin="10,58,10,35" TextWrapping="Wrap"
+                  Text="" VerticalAlignment="Stretch" Width="auto" Name="OutPut" MinWidth="400" MinLines="20"  />
+        <Button  Content="Close" HorizontalAlignment="Right" Margin="0,0,10.333,9.667" VerticalAlignment="Bottom" Width="75" Click="Button_Click" />
+        
+        
     </Grid>
 </Window>
