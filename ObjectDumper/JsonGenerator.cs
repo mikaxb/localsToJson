@@ -64,12 +64,18 @@ namespace ObjectDumper
                 case "string":
                 case "System.DateTime":
                 case "int":
+                case "uint":
                 case "char":
                 case "bool":
                 case "double":
                 case "float":
                 case "decimal":
                 case "long":
+                case "ulong":
+                case "byte":
+                case "sbyte":
+                case "short":
+                case "ushort":
                     return true;
 
                 default:
